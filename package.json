@@ -1,6 +1,6 @@
 {
   "name": "gladys-advantage-air",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Gladys Assistant integration for Advantage Air air conditioning systems (MyAir, e-zone, MyPlace), over the local network.",
   "type": "module",

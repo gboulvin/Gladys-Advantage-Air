@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-26
+
 ### Added
 
 - First release of the Advantage Air integration for Gladys Assistant, over the
@@ -30,4 +32,5 @@ the notes of the version's GitHub Release.
 - A "Test the connection" button in the Configuration screen.
 - English, French, German and Spanish texts and documentation.
 
-[Unreleased]: https://github.com/gboulvin/Gladys-Advantage-Air/commits/main
+[Unreleased]: https://github.com/gboulvin/Gladys-Advantage-Air/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/gboulvin/Gladys-Advantage-Air/releases/tag/v1.0.0
