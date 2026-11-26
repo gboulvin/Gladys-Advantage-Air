@@ -1,0 +1,1130 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Advantage Air",
+  "description": {
+    "en": "Control your Advantage Air MyAir, e-zone and MyPlace systems locally.",
+    "fr": "Pilotez vos systèmes Advantage Air MyAir, e-zone et MyPlace en local.",
+    "de": "Steuern Sie Ihre Advantage Air MyAir-, e-zone- und MyPlace-Systeme lokal.",
+    "es": "Controle localmente sus sistemas Advantage Air MyAir, e-zone y MyPlace."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-advantage-air:0.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-Advantage-Air/main/cover.jpg",
+  "categories": ["climate", "lighting"],
+  "keywords": ["advantage air", "myair", "e-zone", "myplace", "mylights", "mythings", "ducted"],
+  "countries": ["AU", "NZ"],
+  "transports": ["local"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "The integration talks to the Advantage Air wall tablet (MyAir, e-zone, MyPlace) over your local network: no account, no cloud. Give the tablet a fixed IP address in your router, keep the MyPlace / MyAir app running on it, and enter that address below.",
+        "fr": "L'intégration dialogue avec la tablette murale Advantage Air (MyAir, e-zone, MyPlace) sur votre réseau local : pas de compte, pas de cloud. Donnez une adresse IP fixe à la tablette dans votre box, laissez l'application MyPlace / MyAir ouverte et saisissez cette adresse ci-dessous.",
+        "de": "Die Integration kommuniziert über Ihr lokales Netzwerk mit dem Advantage-Air-Wandtablet (MyAir, e-zone, MyPlace): kein Konto, keine Cloud. Geben Sie dem Tablet in Ihrem Router eine feste IP-Adresse, lassen Sie die MyPlace-/MyAir-App darauf laufen und tragen Sie die Adresse unten ein.",
+        "es": "La integración se comunica con la tableta de pared Advantage Air (MyAir, e-zone, MyPlace) a través de su red local: sin cuenta ni nube. Asigne una dirección IP fija a la tableta en su router, mantenga abierta la aplicación MyPlace / MyAir y escriba esa dirección abajo."
+      },
+      "links": [
+        {
+          "url": "https://www.advantageair.com.au/",
+          "label": {
+            "en": "Advantage Air website",
+            "fr": "Site Advantage Air",
+            "de": "Advantage-Air-Website",
+            "es": "Sitio de Advantage Air"
+          }
+        }
+      ]
+    },
+    {
+      "key": "host",
+      "type": "string",
+      "label": {
+        "en": "Tablet IP address",
+        "fr": "Adresse IP de la tablette",
+        "de": "IP-Adresse des Tablets",
+        "es": "Dirección IP de la tableta"
+      },
+      "description": {
+        "en": "Local IP address (or host name) of the Advantage Air wall tablet.",
+        "fr": "Adresse IP locale (ou nom d'hôte) de la tablette murale Advantage Air.",
+        "de": "Lokale IP-Adresse (oder Hostname) des Advantage-Air-Wandtablets.",
+        "es": "Dirección IP local (o nombre de host) de la tableta de pared Advantage Air."
+      },
+      "placeholder": {
+        "en": "e.g. 192.168.1.50",
+        "fr": "ex. 192.168.1.50",
+        "de": "z. B. 192.168.1.50",
+        "es": "p. ej. 192.168.1.50"
+      },
+      "required": true
+    },
+    {
+      "key": "port",
+      "type": "number",
+      "label": {
+        "en": "Port",
+        "fr": "Port",
+        "de": "Port",
+        "es": "Puerto"
+      },
+      "description": {
+        "en": "Port of the local API of the tablet. Keep 2025 unless you know otherwise.",
+        "fr": "Port de l'API locale de la tablette. Laissez 2025, sauf indication contraire.",
+        "de": "Port der lokalen API des Tablets. Behalten Sie 2025, sofern nicht anders bekannt.",
+        "es": "Puerto de la API local de la tableta. Mantenga 2025 salvo indicación contraria."
+      },
+      "required": false,
+      "default": 2025,
+      "min": 1,
+      "max": 65535
+    },
+    {
+      "key": "refresh_interval",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "How often the tablet is read, in seconds (5 to 300).",
+        "fr": "Fréquence de lecture de la tablette, en secondes (5 à 300).",
+        "de": "Wie oft das Tablet gelesen wird, in Sekunden (5 bis 300).",
+        "es": "Frecuencia de lectura de la tableta, en segundos (5 a 300)."
+      },
+      "required": false,
+      "default": 15,
+      "min": 5,
+      "max": 300
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Read the tablet and list what was found.",
+        "fr": "Lit la tablette et liste ce qui a été trouvé.",
+        "de": "Liest das Tablet und listet die gefundenen Geräte auf.",
+        "es": "Lee la tableta y enumera lo encontrado."
+      },
+      "timeout_seconds": 45
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "aircon_power_changed",
+      "label": {
+        "en": "Air conditioner turned on or off",
+        "fr": "Climatiseur allumé ou éteint",
+        "de": "Klimaanlage ein- oder ausgeschaltet",
+        "es": "Aire acondicionado encendido o apagado"
+      },
+      "description": {
+        "en": "An air conditioner was turned on or off, from Gladys, the tablet or a timer.",
+        "fr": "Un climatiseur a été allumé ou éteint, depuis Gladys, la tablette ou un minuteur.",
+        "de": "Eine Klimaanlage wurde über Gladys, das Tablet oder einen Timer ein- oder ausgeschaltet.",
+        "es": "Un aire acondicionado se encendió o apagó, desde Gladys, la tableta o un temporizador."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          }
+        },
+        {
+          "key": "state",
+          "type": "multi_select",
+          "label": {
+            "en": "New state",
+            "fr": "Nouvel état",
+            "de": "Neuer Zustand",
+            "es": "Nuevo estado"
+          },
+          "options": [
+            {
+              "value": "on",
+              "label": {
+                "en": "On",
+                "fr": "Allumé",
+                "de": "Ein",
+                "es": "Encendido"
+              }
+            },
+            {
+              "value": "off",
+              "label": {
+                "en": "Off",
+                "fr": "Éteint",
+                "de": "Aus",
+                "es": "Apagado"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "state",
+          "type": "string",
+          "label": {
+            "en": "State (on / off)",
+            "fr": "État (on / off)",
+            "de": "Zustand (on / off)",
+            "es": "Estado (on / off)"
+          }
+        },
+        {
+          "key": "mode",
+          "type": "string",
+          "label": {
+            "en": "Mode",
+            "fr": "Mode",
+            "de": "Modus",
+            "es": "Modo"
+          }
+        }
+      ]
+    },
+    {
+      "key": "aircon_mode_changed",
+      "label": {
+        "en": "Air conditioning mode changed",
+        "fr": "Mode de climatisation changé",
+        "de": "Klimamodus geändert",
+        "es": "Modo de climatización cambiado"
+      },
+      "description": {
+        "en": "The mode of an air conditioner changed (cool, heat, fan, dry, MyAuto).",
+        "fr": "Le mode d'un climatiseur a changé (froid, chaud, ventilation, déshumidification, MyAuto).",
+        "de": "Der Modus einer Klimaanlage hat sich geändert (Kühlen, Heizen, Lüften, Entfeuchten, MyAuto).",
+        "es": "El modo de un aire acondicionado cambió (frío, calor, ventilación, deshumidificar, MyAuto)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          }
+        },
+        {
+          "key": "mode",
+          "type": "multi_select",
+          "label": {
+            "en": "New mode",
+            "fr": "Nouveau mode",
+            "de": "Neuer Modus",
+            "es": "Nuevo modo"
+          },
+          "options": [
+            {
+              "value": "cool",
+              "label": {
+                "en": "Cool",
+                "fr": "Froid",
+                "de": "Kühlen",
+                "es": "Frío"
+              }
+            },
+            {
+              "value": "heat",
+              "label": {
+                "en": "Heat",
+                "fr": "Chaud",
+                "de": "Heizen",
+                "es": "Calor"
+              }
+            },
+            {
+              "value": "vent",
+              "label": {
+                "en": "Fan",
+                "fr": "Ventilation",
+                "de": "Lüften",
+                "es": "Ventilación"
+              }
+            },
+            {
+              "value": "dry",
+              "label": {
+                "en": "Dry",
+                "fr": "Déshumidification",
+                "de": "Entfeuchten",
+                "es": "Deshumidificar"
+              }
+            },
+            {
+              "value": "myauto",
+              "label": {
+                "en": "MyAuto",
+                "fr": "MyAuto",
+                "de": "MyAuto",
+                "es": "MyAuto"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "mode",
+          "type": "string",
+          "label": {
+            "en": "New mode",
+            "fr": "Nouveau mode",
+            "de": "Neuer Modus",
+            "es": "Nuevo modo"
+          }
+        },
+        {
+          "key": "previous_mode",
+          "type": "string",
+          "label": {
+            "en": "Previous mode",
+            "fr": "Mode précédent",
+            "de": "Vorheriger Modus",
+            "es": "Modo anterior"
+          }
+        }
+      ]
+    },
+    {
+      "key": "filter_clean_needed",
+      "label": {
+        "en": "Filter needs cleaning",
+        "fr": "Filtre à nettoyer",
+        "de": "Filter muss gereinigt werden",
+        "es": "El filtro necesita limpieza"
+      },
+      "description": {
+        "en": "The air conditioner asks for its filter to be cleaned.",
+        "fr": "Le climatiseur demande le nettoyage de son filtre.",
+        "de": "Die Klimaanlage fordert eine Filterreinigung an.",
+        "es": "El aire acondicionado solicita la limpieza de su filtro."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "aircon_error",
+      "label": {
+        "en": "Air conditioner error",
+        "fr": "Erreur du climatiseur",
+        "de": "Fehler der Klimaanlage",
+        "es": "Error del aire acondicionado"
+      },
+      "description": {
+        "en": "The air conditioner reports an error code.",
+        "fr": "Le climatiseur signale un code d'erreur.",
+        "de": "Die Klimaanlage meldet einen Fehlercode.",
+        "es": "El aire acondicionado informa de un código de error."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "error_code",
+          "type": "string",
+          "label": {
+            "en": "Error code",
+            "fr": "Code d'erreur",
+            "de": "Fehlercode",
+            "es": "Código de error"
+          }
+        }
+      ]
+    },
+    {
+      "key": "zone_state_changed",
+      "label": {
+        "en": "Zone opened or closed",
+        "fr": "Zone ouverte ou fermée",
+        "de": "Zone geöffnet oder geschlossen",
+        "es": "Zona abierta o cerrada"
+      },
+      "description": {
+        "en": "A zone was opened or closed.",
+        "fr": "Une zone a été ouverte ou fermée.",
+        "de": "Eine Zone wurde geöffnet oder geschlossen.",
+        "es": "Una zona se abrió o se cerró."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Zone",
+            "fr": "Zone",
+            "de": "Zone",
+            "es": "Zona"
+          }
+        },
+        {
+          "key": "state",
+          "type": "multi_select",
+          "label": {
+            "en": "New state",
+            "fr": "Nouvel état",
+            "de": "Neuer Zustand",
+            "es": "Nuevo estado"
+          },
+          "options": [
+            {
+              "value": "open",
+              "label": {
+                "en": "Open",
+                "fr": "Ouverte",
+                "de": "Offen",
+                "es": "Abierta"
+              }
+            },
+            {
+              "value": "close",
+              "label": {
+                "en": "Closed",
+                "fr": "Fermée",
+                "de": "Geschlossen",
+                "es": "Cerrada"
+              }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "state",
+          "type": "string",
+          "label": {
+            "en": "State (open / close)",
+            "fr": "État (open / close)",
+            "de": "Zustand (open / close)",
+            "es": "Estado (open / close)"
+          }
+        },
+        {
+          "key": "opening",
+          "type": "number",
+          "label": {
+            "en": "Opening (%)",
+            "fr": "Ouverture (%)",
+            "de": "Öffnung (%)",
+            "es": "Apertura (%)"
+          }
+        }
+      ]
+    },
+    {
+      "key": "zone_motion_detected",
+      "label": {
+        "en": "Motion detected in a zone",
+        "fr": "Mouvement détecté dans une zone",
+        "de": "Bewegung in einer Zone erkannt",
+        "es": "Movimiento detectado en una zona"
+      },
+      "description": {
+        "en": "The sensor of a zone detected motion (sensors with motion detection only).",
+        "fr": "Le capteur d'une zone a détecté un mouvement (capteurs avec détection de mouvement uniquement).",
+        "de": "Der Sensor einer Zone hat eine Bewegung erkannt (nur Sensoren mit Bewegungserkennung).",
+        "es": "El sensor de una zona detectó movimiento (solo sensores con detección de movimiento)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Zone",
+            "fr": "Zone",
+            "de": "Zone",
+            "es": "Zona"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "control_aircon",
+      "label": {
+        "en": "Control an air conditioner",
+        "fr": "Piloter un climatiseur",
+        "de": "Klimaanlage steuern",
+        "es": "Controlar un aire acondicionado"
+      },
+      "description": {
+        "en": "Set power, mode, fan speed and set point in one go.",
+        "fr": "Règle marche, mode, ventilation et consigne en une fois.",
+        "de": "Betrieb, Modus, Lüfterstufe und Sollwert in einem Schritt einstellen.",
+        "es": "Ajusta encendido, modo, ventilador y consigna de una vez."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          },
+          "required": true
+        },
+        {
+          "key": "power",
+          "type": "select",
+          "label": {
+            "en": "Power",
+            "fr": "Marche",
+            "de": "Betrieb",
+            "es": "Encendido"
+          },
+          "default": "unchanged",
+          "options": [
+            {
+              "value": "unchanged",
+              "label": {
+                "en": "Unchanged",
+                "fr": "Inchangé",
+                "de": "Unverändert",
+                "es": "Sin cambios"
+              }
+            },
+            {
+              "value": "on",
+              "label": {
+                "en": "On",
+                "fr": "Allumé",
+                "de": "Ein",
+                "es": "Encendido"
+              }
+            },
+            {
+              "value": "off",
+              "label": {
+                "en": "Off",
+                "fr": "Éteint",
+                "de": "Aus",
+                "es": "Apagado"
+              }
+            }
+          ]
+        },
+        {
+          "key": "mode",
+          "type": "select",
+          "label": {
+            "en": "Mode",
+            "fr": "Mode",
+            "de": "Modus",
+            "es": "Modo"
+          },
+          "default": "unchanged",
+          "options": [
+            {
+              "value": "unchanged",
+              "label": {
+                "en": "Unchanged",
+                "fr": "Inchangé",
+                "de": "Unverändert",
+                "es": "Sin cambios"
+              }
+            },
+            {
+              "value": "cool",
+              "label": {
+                "en": "Cool",
+                "fr": "Froid",
+                "de": "Kühlen",
+                "es": "Frío"
+              }
+            },
+            {
+              "value": "heat",
+              "label": {
+                "en": "Heat",
+                "fr": "Chaud",
+                "de": "Heizen",
+                "es": "Calor"
+              }
+            },
+            {
+              "value": "vent",
+              "label": {
+                "en": "Fan",
+                "fr": "Ventilation",
+                "de": "Lüften",
+                "es": "Ventilación"
+              }
+            },
+            {
+              "value": "dry",
+              "label": {
+                "en": "Dry",
+                "fr": "Déshumidification",
+                "de": "Entfeuchten",
+                "es": "Deshumidificar"
+              }
+            },
+            {
+              "value": "myauto",
+              "label": {
+                "en": "MyAuto",
+                "fr": "MyAuto",
+                "de": "MyAuto",
+                "es": "MyAuto"
+              }
+            }
+          ]
+        },
+        {
+          "key": "fan",
+          "type": "select",
+          "label": {
+            "en": "Fan speed",
+            "fr": "Vitesse de ventilation",
+            "de": "Lüfterstufe",
+            "es": "Velocidad del ventilador"
+          },
+          "default": "unchanged",
+          "options": [
+            {
+              "value": "unchanged",
+              "label": {
+                "en": "Unchanged",
+                "fr": "Inchangé",
+                "de": "Unverändert",
+                "es": "Sin cambios"
+              }
+            },
+            {
+              "value": "low",
+              "label": {
+                "en": "Low",
+                "fr": "Faible",
+                "de": "Niedrig",
+                "es": "Baja"
+              }
+            },
+            {
+              "value": "medium",
+              "label": {
+                "en": "Medium",
+                "fr": "Moyenne",
+                "de": "Mittel",
+                "es": "Media"
+              }
+            },
+            {
+              "value": "high",
+              "label": {
+                "en": "High",
+                "fr": "Forte",
+                "de": "Hoch",
+                "es": "Alta"
+              }
+            },
+            {
+              "value": "auto",
+              "label": {
+                "en": "Auto (MyFan)",
+                "fr": "Auto (MyFan)",
+                "de": "Auto (MyFan)",
+                "es": "Auto (MyFan)"
+              }
+            }
+          ]
+        },
+        {
+          "key": "target_temperature",
+          "type": "number",
+          "label": {
+            "en": "Set point (°C)",
+            "fr": "Consigne (°C)",
+            "de": "Sollwert (°C)",
+            "es": "Consigna (°C)"
+          },
+          "description": {
+            "en": "Leave empty to keep the current set point.",
+            "fr": "Laissez vide pour garder la consigne actuelle.",
+            "de": "Leer lassen, um den aktuellen Sollwert zu behalten.",
+            "es": "Déjelo vacío para mantener la consigna actual."
+          },
+          "required": false,
+          "min": 16,
+          "max": 32
+        }
+      ],
+      "outputs": [
+        {
+          "key": "changed",
+          "type": "boolean",
+          "label": {
+            "en": "Change sent",
+            "fr": "Changement envoyé",
+            "de": "Änderung gesendet",
+            "es": "Cambio enviado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "control_zone",
+      "label": {
+        "en": "Control a zone",
+        "fr": "Piloter une zone",
+        "de": "Zone steuern",
+        "es": "Controlar una zona"
+      },
+      "description": {
+        "en": "Open or close a zone, set its opening or its set point.",
+        "fr": "Ouvre ou ferme une zone, règle son ouverture ou sa consigne.",
+        "de": "Eine Zone öffnen oder schließen, ihre Öffnung oder ihren Sollwert einstellen.",
+        "es": "Abre o cierra una zona, ajusta su apertura o su consigna."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Zone",
+            "fr": "Zone",
+            "de": "Zone",
+            "es": "Zona"
+          },
+          "required": true
+        },
+        {
+          "key": "state",
+          "type": "select",
+          "label": {
+            "en": "State",
+            "fr": "État",
+            "de": "Zustand",
+            "es": "Estado"
+          },
+          "default": "unchanged",
+          "options": [
+            {
+              "value": "unchanged",
+              "label": {
+                "en": "Unchanged",
+                "fr": "Inchangé",
+                "de": "Unverändert",
+                "es": "Sin cambios"
+              }
+            },
+            {
+              "value": "open",
+              "label": {
+                "en": "Open",
+                "fr": "Ouverte",
+                "de": "Offen",
+                "es": "Abierta"
+              }
+            },
+            {
+              "value": "close",
+              "label": {
+                "en": "Closed",
+                "fr": "Fermée",
+                "de": "Geschlossen",
+                "es": "Cerrada"
+              }
+            }
+          ]
+        },
+        {
+          "key": "opening",
+          "type": "number",
+          "label": {
+            "en": "Opening (%)",
+            "fr": "Ouverture (%)",
+            "de": "Öffnung (%)",
+            "es": "Apertura (%)"
+          },
+          "description": {
+            "en": "Zones without temperature sensor only. Leave empty to keep it.",
+            "fr": "Zones sans capteur de température uniquement. Laissez vide pour la garder.",
+            "de": "Nur Zonen ohne Temperatursensor. Leer lassen, um sie zu behalten.",
+            "es": "Solo zonas sin sensor de temperatura. Déjelo vacío para mantenerla."
+          },
+          "required": false,
+          "min": 5,
+          "max": 100
+        },
+        {
+          "key": "target_temperature",
+          "type": "number",
+          "label": {
+            "en": "Set point (°C)",
+            "fr": "Consigne (°C)",
+            "de": "Sollwert (°C)",
+            "es": "Consigna (°C)"
+          },
+          "description": {
+            "en": "Zones with temperature sensor only. Leave empty to keep it.",
+            "fr": "Zones avec capteur de température uniquement. Laissez vide pour la garder.",
+            "de": "Nur Zonen mit Temperatursensor. Leer lassen, um ihn zu behalten.",
+            "es": "Solo zonas con sensor de temperatura. Déjelo vacío para mantenerla."
+          },
+          "required": false,
+          "min": 16,
+          "max": 32
+        }
+      ],
+      "outputs": [
+        {
+          "key": "changed",
+          "type": "boolean",
+          "label": {
+            "en": "Change sent",
+            "fr": "Changement envoyé",
+            "de": "Änderung gesendet",
+            "es": "Cambio enviado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "set_all_zones",
+      "label": {
+        "en": "Open or close all zones",
+        "fr": "Ouvrir ou fermer toutes les zones",
+        "de": "Alle Zonen öffnen oder schließen",
+        "es": "Abrir o cerrar todas las zonas"
+      },
+      "description": {
+        "en": "Open or close every zone of an air conditioner.",
+        "fr": "Ouvre ou ferme toutes les zones d'un climatiseur.",
+        "de": "Alle Zonen einer Klimaanlage öffnen oder schließen.",
+        "es": "Abre o cierra todas las zonas de un aire acondicionado."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          },
+          "required": true
+        },
+        {
+          "key": "state",
+          "type": "select",
+          "label": {
+            "en": "State",
+            "fr": "État",
+            "de": "Zustand",
+            "es": "Estado"
+          },
+          "required": true,
+          "default": "open",
+          "options": [
+            {
+              "value": "open",
+              "label": {
+                "en": "Open",
+                "fr": "Ouverte",
+                "de": "Offen",
+                "es": "Abierta"
+              }
+            },
+            {
+              "value": "close",
+              "label": {
+                "en": "Closed",
+                "fr": "Fermée",
+                "de": "Geschlossen",
+                "es": "Cerrada"
+              }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "changed",
+          "type": "boolean",
+          "label": {
+            "en": "Change sent",
+            "fr": "Changement envoyé",
+            "de": "Änderung gesendet",
+            "es": "Cambio enviado"
+          }
+        },
+        {
+          "key": "zones",
+          "type": "number",
+          "label": {
+            "en": "Zones changed",
+            "fr": "Zones modifiées",
+            "de": "Geänderte Zonen",
+            "es": "Zonas modificadas"
+          }
+        }
+      ]
+    },
+    {
+      "key": "set_myzone",
+      "label": {
+        "en": "Set the MyZone",
+        "fr": "Définir la MyZone",
+        "de": "MyZone festlegen",
+        "es": "Definir la MyZone"
+      },
+      "description": {
+        "en": "Make the air conditioner follow the temperature of this zone.",
+        "fr": "Le climatiseur suit la température de cette zone.",
+        "de": "Die Klimaanlage folgt der Temperatur dieser Zone.",
+        "es": "El aire acondicionado sigue la temperatura de esta zona."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Zone",
+            "fr": "Zone",
+            "de": "Zone",
+            "es": "Zona"
+          },
+          "required": true
+        }
+      ],
+      "outputs": [
+        {
+          "key": "changed",
+          "type": "boolean",
+          "label": {
+            "en": "Change sent",
+            "fr": "Changement envoyé",
+            "de": "Änderung gesendet",
+            "es": "Cambio enviado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "set_timer",
+      "label": {
+        "en": "Set a timer",
+        "fr": "Programmer un minuteur",
+        "de": "Timer einstellen",
+        "es": "Programar un temporizador"
+      },
+      "description": {
+        "en": "Turn the air conditioner on or off after a delay (0 cancels).",
+        "fr": "Allume ou éteint le climatiseur après un délai (0 annule).",
+        "de": "Die Klimaanlage nach einer Verzögerung ein- oder ausschalten (0 bricht ab).",
+        "es": "Enciende o apaga el aire acondicionado tras un retraso (0 cancela)."
+      },
+      "timeout_seconds": 30,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          },
+          "required": true
+        },
+        {
+          "key": "timer",
+          "type": "select",
+          "label": {
+            "en": "Timer",
+            "fr": "Minuteur",
+            "de": "Timer",
+            "es": "Temporizador"
+          },
+          "required": true,
+          "default": "off",
+          "options": [
+            {
+              "value": "on",
+              "label": {
+                "en": "Turn on in",
+                "fr": "S'allumer dans",
+                "de": "Einschalten in",
+                "es": "Encender en"
+              }
+            },
+            {
+              "value": "off",
+              "label": {
+                "en": "Turn off in",
+                "fr": "S'éteindre dans",
+                "de": "Ausschalten in",
+                "es": "Apagar en"
+              }
+            }
+          ]
+        },
+        {
+          "key": "minutes",
+          "type": "number",
+          "label": {
+            "en": "Minutes",
+            "fr": "Minutes",
+            "de": "Minuten",
+            "es": "Minutos"
+          },
+          "required": true,
+          "default": 60,
+          "min": 0,
+          "max": 720
+        }
+      ],
+      "outputs": [
+        {
+          "key": "changed",
+          "type": "boolean",
+          "label": {
+            "en": "Change sent",
+            "fr": "Changement envoyé",
+            "de": "Änderung gesendet",
+            "es": "Cambio enviado"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "aircon_status",
+      "label": {
+        "en": "Air conditioner",
+        "fr": "Climatiseur",
+        "de": "Klimaanlage",
+        "es": "Aire acondicionado"
+      },
+      "description": {
+        "en": "Set point, MyZone, mode, fan, filter, errors and a power button.",
+        "fr": "Consigne, MyZone, mode, ventilation, filtre, erreurs et bouton marche.",
+        "de": "Sollwert, MyZone, Modus, Lüfter, Filter, Fehler und Ein/Aus-Taste.",
+        "es": "Consigna, MyZone, modo, ventilador, filtro, errores y botón de encendido."
+      },
+      "icon": "wind",
+      "action_timeout_seconds": 30,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          },
+          "description": {
+            "en": "Leave empty to show the first air conditioner.",
+            "fr": "Laissez vide pour afficher le premier climatiseur.",
+            "de": "Leer lassen, um die erste Klimaanlage anzuzeigen.",
+            "es": "Déjelo vacío para mostrar el primer aire acondicionado."
+          }
+        }
+      ]
+    },
+    {
+      "key": "zones",
+      "label": {
+        "en": "Zones",
+        "fr": "Zones",
+        "de": "Zonen",
+        "es": "Zonas"
+      },
+      "description": {
+        "en": "State, opening and temperature of every zone.",
+        "fr": "État, ouverture et température de chaque zone.",
+        "de": "Zustand, Öffnung und Temperatur jeder Zone.",
+        "es": "Estado, apertura y temperatura de cada zona."
+      },
+      "icon": "grid",
+      "action_timeout_seconds": 30,
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Air conditioner",
+            "fr": "Climatiseur",
+            "de": "Klimaanlage",
+            "es": "Aire acondicionado"
+          },
+          "description": {
+            "en": "Leave empty to show the first air conditioner.",
+            "fr": "Laissez vide pour afficher le premier climatiseur.",
+            "de": "Leer lassen, um die erste Klimaanlage anzuzeigen.",
+            "es": "Déjelo vacío para mostrar el primer aire acondicionado."
+          }
+        }
+      ]
+    }
+  ]
+}
